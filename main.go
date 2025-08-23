@@ -27,6 +27,9 @@ func main() {
 
 	var filePath string
 	flag.StringVar(&filePath, "path", "./input.mp3", "path to the audio file to be transcribed (e.g., ./input.mp3)")
+
+	var skipAudioProcessing bool
+	flag.BoolVar(&skipAudioProcessing, "skip-processing", false, "skip audio processing with ffmpeg")
 	flag.Parse()
 
 	if filePath == "" {
@@ -35,7 +38,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	res, err := transcribe(apiKey, filePath)
+	processedPath := filePath
+	if !skipAudioProcessing {
+		processedPath = "./processed.wav"
+		err = ProcessAudio(filePath, processedPath)
+		if err != nil {
+			fmt.Printf("Error: %v", err)
+			fmt.Println()
+			os.Exit(1)
+		}
+	}
+
+	res, err := transcribe(apiKey, processedPath)
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		fmt.Println()
