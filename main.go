@@ -30,6 +30,10 @@ func main() {
 
 	var skipAudioProcessing bool
 	flag.BoolVar(&skipAudioProcessing, "skip-processing", false, "skip audio processing with ffmpeg")
+
+	var velocity float64
+	flag.Float64Var(&velocity, "velocity", 2, "processed audio velocity")
+
 	flag.Parse()
 
 	if filePath == "" {
@@ -41,7 +45,12 @@ func main() {
 	processedPath := filePath
 	if !skipAudioProcessing {
 		processedPath = "./processed.wav"
-		err = ProcessAudio(filePath, processedPath)
+		processingOpts := ProcessingOptions{
+			InputPath:  filePath,
+			OutputPath: processedPath,
+			Velocity:   velocity,
+		}
+		err = ProcessAudio(processingOpts)
 		if err != nil {
 			fmt.Printf("Error: %v", err)
 			fmt.Println()
